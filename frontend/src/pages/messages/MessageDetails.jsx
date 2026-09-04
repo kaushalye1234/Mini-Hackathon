@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import { getMessageById, markMessageRead, replyToMessage } from "../../services/messageService";
+import { firstError, hasErrors, validateMessageForm } from "../../utils/validation";
 
 const getId = (value) => value?.id || value?._id || value;
 const formatDateTime = (date) => (date ? new Date(date).toLocaleString() : "Not set");
@@ -11,6 +12,7 @@ const MessageDetails = () => {
   const { user } = useAuth();
   const [message, setMessage] = useState(null);
   const [reply, setReply] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -40,13 +42,20 @@ const MessageDetails = () => {
     loadMessage();
   }, [id, user]);
 
+  const handleReplyChange = (event) => {
+    setReply(event.target.value);
+    setFieldErrors({ ...fieldErrors, message: "" });
+  };
+
   const handleReply = async (event) => {
     event.preventDefault();
     setError("");
     setNotice("");
 
-    if (!reply.trim()) {
-      setError("Message cannot be empty.");
+    const validationErrors = validateMessageForm(reply);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
       return;
     }
 
@@ -116,7 +125,7 @@ const MessageDetails = () => {
       </article>
 
       <aside className="panel form-panel side-panel">
-        <form className="stacked-form" onSubmit={handleReply}>
+        <form className="stacked-form" onSubmit={handleReply} noValidate>
           <div>
             <p className="eyebrow">Reply</p>
             <h2>Send a reply</h2>
@@ -125,7 +134,13 @@ const MessageDetails = () => {
           {error && <div className="alert alert-error">{error}</div>}
           <label>
             Message
-            <textarea rows="6" value={reply} onChange={(event) => setReply(event.target.value)} />
+            <textarea
+              className={fieldErrors.message ? "input-error" : ""}
+              rows="6"
+              value={reply}
+              onChange={handleReplyChange}
+            />
+            {fieldErrors.message && <span className="field-error">{fieldErrors.message}</span>}
           </label>
           <button className="button" type="submit" disabled={submitting}>
             {submitting ? "Sending..." : "Send Reply"}

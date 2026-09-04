@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+﻿const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
   {
@@ -21,7 +21,8 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: [true, "Message cannot be empty."],
       trim: true,
-      maxlength: [1000, "Message cannot exceed 1000 characters."]
+      minlength: [5, "Message needs 5 characters."],
+      maxlength: [1000, "Message is too long."]
     },
     isRead: {
       type: Boolean,

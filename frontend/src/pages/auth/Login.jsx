@@ -1,16 +1,11 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-
-const validate = (form) => {
-  if (!form.email.trim()) return "Email is required.";
-  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Please enter a valid email address.";
-  if (!form.password) return "Password is required.";
-  return "";
-};
+import { firstError, hasErrors, validateLoginForm } from "../../utils/validation";
 
 const Login = ({ isAdminLogin = false }) => {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -18,16 +13,19 @@ const Login = ({ isAdminLogin = false }) => {
   const location = useLocation();
 
   const handleChange = (event) => {
-    setForm({ ...form, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    setForm({ ...form, [name]: value });
+    setFieldErrors({ ...fieldErrors, [name]: "" });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    const validationError = validate(form);
-    if (validationError) {
-      setError(validationError);
+    const validationErrors = validateLoginForm(form);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
       return;
     }
 
@@ -39,7 +37,7 @@ const Login = ({ isAdminLogin = false }) => {
       const nextPath = fromPath || fallbackPath;
       navigate(nextPath, { replace: true });
     } catch (apiError) {
-      setError(apiError.response?.data?.message || "Login failed.");
+      setError(apiError.response?.data?.message || "Wrong credentials.");
     } finally {
       setLoading(false);
     }
@@ -47,7 +45,7 @@ const Login = ({ isAdminLogin = false }) => {
 
   return (
     <section className="auth-page">
-      <form className="panel form-panel" onSubmit={handleSubmit}>
+      <form className="panel form-panel" onSubmit={handleSubmit} noValidate>
         <div>
           <p className="eyebrow">{isAdminLogin ? "Admin access" : "Secure access"}</p>
           <h1>{isAdminLogin ? "Admin Login" : "Login"}</h1>
@@ -55,11 +53,25 @@ const Login = ({ isAdminLogin = false }) => {
         {error && <div className="alert alert-error">{error}</div>}
         <label>
           Email
-          <input name="email" type="email" value={form.email} onChange={handleChange} />
+          <input
+            className={fieldErrors.email ? "input-error" : ""}
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+          />
+          {fieldErrors.email && <span className="field-error">{fieldErrors.email}</span>}
         </label>
         <label>
           Password
-          <input name="password" type="password" value={form.password} onChange={handleChange} />
+          <input
+            className={fieldErrors.password ? "input-error" : ""}
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+          />
+          {fieldErrors.password && <span className="field-error">{fieldErrors.password}</span>}
         </label>
         <button className="button" type="submit" disabled={loading}>
           {loading ? "Signing in..." : isAdminLogin ? "Admin Login" : "Login"}

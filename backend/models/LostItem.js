@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+﻿const mongoose = require("mongoose");
 
 const STATUSES = ["LOST", "RESOLVED"];
 const CATEGORIES = [
@@ -19,29 +19,42 @@ const lostItemSchema = new mongoose.Schema(
       type: String,
       required: [true, "Item name is required."],
       trim: true,
-      minlength: [2, "Item name must be at least 2 characters long."],
-      maxlength: [80, "Item name cannot exceed 80 characters."]
+      minlength: [2, "Item name needs 2 characters."],
+      maxlength: [80, "Item name is too long."]
     },
     category: {
       type: String,
-      required: [true, "Please select a category."],
+      required: [true, "Select a category."],
       enum: CATEGORIES
     },
     description: {
       type: String,
       required: [true, "Description is required."],
       trim: true,
-      maxlength: [600, "Description cannot exceed 600 characters."]
+      minlength: [10, "Add more description."],
+      maxlength: [600, "Description is too long."]
     },
     lostLocation: {
       type: String,
-      required: [true, "Lost location is required."],
+      required: [true, "Location is required."],
       trim: true,
-      maxlength: [120, "Lost location cannot exceed 120 characters."]
+      minlength: [3, "Location needs 3 characters."],
+      maxlength: [120, "Location is too long."]
     },
     lostDate: {
       type: Date,
-      required: [true, "Please enter a valid lost date."]
+      required: [true, "Select a valid date."],
+      validate: {
+        validator: (value) => {
+          if (!value) return false;
+          const selected = new Date(value);
+          const today = new Date();
+          selected.setHours(0, 0, 0, 0);
+          today.setHours(0, 0, 0, 0);
+          return selected <= today;
+        },
+        message: "You can't set a future date."
+      }
     },
     imageUrl: {
       type: String,

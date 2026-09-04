@@ -1,6 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { categories, createLostItem } from "../../services/lostItemService";
+import { firstError, hasErrors, todayInputValue, validateLostItemForm } from "../../utils/validation";
 
 const initialForm = {
   itemName: "",
@@ -23,28 +24,9 @@ const buildLostItemFormData = (form, imageFile) => {
   return formData;
 };
 
-const validateImage = (file) => {
-  if (!file) return "";
-  if (!file.type.startsWith("image/")) return "Please upload an image file.";
-  if (file.size > 5 * 1024 * 1024) return "Image cannot exceed 5 MB.";
-  return "";
-};
-
-const validate = (form, imageFile) => {
-  if (!form.itemName.trim()) return "Item name is required.";
-  if (form.itemName.trim().length < 2) return "Item name must be at least 2 characters long.";
-  if (!form.category) return "Please select a category.";
-  if (!form.description.trim()) return "Description is required.";
-  if (form.description.trim().length > 600) return "Description cannot exceed the allowed length.";
-  if (!form.lostLocation.trim()) return "Lost location is required.";
-  if (!form.lostDate || Number.isNaN(Date.parse(form.lostDate))) {
-    return "Please enter a valid lost date.";
-  }
-  return validateImage(imageFile);
-};
-
 const ReportLostItem = () => {
   const [form, setForm] = useState(initialForm);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [error, setError] = useState("");
@@ -52,22 +34,26 @@ const ReportLostItem = () => {
   const navigate = useNavigate();
 
   const handleChange = (event) => {
-    setForm({ ...form, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    setForm({ ...form, [name]: value });
+    setFieldErrors({ ...fieldErrors, [name]: "" });
   };
 
   const handleImageChange = (event) => {
     const file = event.target.files?.[0] || null;
     setImageFile(file);
     setImagePreview(file ? URL.createObjectURL(file) : "");
+    setFieldErrors({ ...fieldErrors, image: "" });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    const validationError = validate(form, imageFile);
-    if (validationError) {
-      setError(validationError);
+    const validationErrors = validateLostItemForm(form, imageFile, categories);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
       return;
     }
 
@@ -84,7 +70,7 @@ const ReportLostItem = () => {
 
   return (
     <section className="auth-page">
-      <form className="panel form-panel" onSubmit={handleSubmit}>
+      <form className="panel form-panel" onSubmit={handleSubmit} noValidate>
         <div>
           <p className="eyebrow">New report</p>
           <h1>Report Lost Item</h1>
@@ -92,11 +78,22 @@ const ReportLostItem = () => {
         {error && <div className="alert alert-error">{error}</div>}
         <label>
           Item Name
-          <input name="itemName" value={form.itemName} onChange={handleChange} />
+          <input
+            className={fieldErrors.itemName ? "input-error" : ""}
+            name="itemName"
+            value={form.itemName}
+            onChange={handleChange}
+          />
+          {fieldErrors.itemName && <span className="field-error">{fieldErrors.itemName}</span>}
         </label>
         <label>
           Category
-          <select name="category" value={form.category} onChange={handleChange}>
+          <select
+            className={fieldErrors.category ? "input-error" : ""}
+            name="category"
+            value={form.category}
+            onChange={handleChange}
+          >
             <option value="">Select category</option>
             {categories.map((category) => (
               <option key={category} value={category}>
@@ -104,22 +101,51 @@ const ReportLostItem = () => {
               </option>
             ))}
           </select>
+          {fieldErrors.category && <span className="field-error">{fieldErrors.category}</span>}
         </label>
         <label>
           Description
-          <textarea name="description" value={form.description} onChange={handleChange} rows="5" />
+          <textarea
+            className={fieldErrors.description ? "input-error" : ""}
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            rows="5"
+          />
+          {fieldErrors.description && <span className="field-error">{fieldErrors.description}</span>}
         </label>
         <label>
           Lost Location
-          <input name="lostLocation" value={form.lostLocation} onChange={handleChange} />
+          <input
+            className={fieldErrors.lostLocation ? "input-error" : ""}
+            name="lostLocation"
+            value={form.lostLocation}
+            onChange={handleChange}
+          />
+          {fieldErrors.lostLocation && <span className="field-error">{fieldErrors.lostLocation}</span>}
         </label>
         <label>
           Lost Date
-          <input name="lostDate" type="date" value={form.lostDate} onChange={handleChange} />
+          <input
+            className={fieldErrors.lostDate ? "input-error" : ""}
+            max={todayInputValue()}
+            name="lostDate"
+            type="date"
+            value={form.lostDate}
+            onChange={handleChange}
+          />
+          {fieldErrors.lostDate && <span className="field-error">{fieldErrors.lostDate}</span>}
         </label>
         <label>
           Item Image optional
-          <input accept="image/*" name="image" type="file" onChange={handleImageChange} />
+          <input
+            accept="image/*"
+            className={fieldErrors.image ? "input-error" : ""}
+            name="image"
+            type="file"
+            onChange={handleImageChange}
+          />
+          {fieldErrors.image && <span className="field-error">{fieldErrors.image}</span>}
         </label>
         {imagePreview && (
           <div className="image-preview">

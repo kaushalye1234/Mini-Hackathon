@@ -1,4 +1,4 @@
-const fail = (res, message) => res.status(400).json({ message });
+﻿const fail = (res, message) => res.status(400).json({ message });
 const isBlank = (value) => typeof value !== "string" || value.trim().length === 0;
 
 const trimBodyStrings = (req, res, next) => {
@@ -15,8 +15,12 @@ const validateMessageText = (req, res, next) => {
     return fail(res, "Message cannot be empty.");
   }
 
+  if (req.body.message.trim().length < 5) {
+    return fail(res, "Message needs 5 characters.");
+  }
+
   if (req.body.message.trim().length > 1000) {
-    return fail(res, "Message cannot exceed 1000 characters.");
+    return fail(res, "Message is too long.");
   }
 
   next();

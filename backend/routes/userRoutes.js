@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const {
   createUser,
   deleteUser,
@@ -14,7 +14,8 @@ const {
   trimBodyStrings,
   validateCreateUser,
   validateUpdateProfile,
-  validateUpdateUser
+  validateUpdateUser,
+  validateUserFilters
 } = require("../middleware/validators/userValidator");
 
 const router = express.Router();
@@ -22,7 +23,7 @@ const adminOnly = [authMiddleware, authorizeRoles("admin")];
 
 router.put("/profile", authMiddleware, trimBodyStrings, validateUpdateProfile, updateProfile);
 router.get("/stats", ...adminOnly, getDashboardStats);
-router.get("/", ...adminOnly, getAllUsers);
+router.get("/", ...adminOnly, validateUserFilters, getAllUsers);
 router.post("/", ...adminOnly, trimBodyStrings, validateCreateUser, createUser);
 router.get("/:id", ...adminOnly, getUserById);
 router.put("/:id", ...adminOnly, trimBodyStrings, validateUpdateUser, updateUser);

@@ -1038,3 +1038,26 @@ input[type="file"]::file-selector-button {
     height: 200px;
   }
 }
+
+/* Form validation */
+.field-error {
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-top: -2px;
+}
+
+input.input-error,
+select.input-error,
+textarea.input-error {
+  background: #fff8f8;
+  border-color: #d92d20;
+}
+
+input.input-error:focus,
+select.input-error:focus,
+textarea.input-error:focus {
+  border-color: #d92d20;
+  outline-color: rgba(217, 45, 32, 0.16);
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import {
@@ -7,6 +7,7 @@ import {
   resolveLostItem
 } from "../../services/lostItemService";
 import { sendMessage } from "../../services/messageService";
+import { firstError, hasErrors, validateMessageForm } from "../../utils/validation";
 
 const getId = (value) => value?.id || value?._id || value;
 const formatDate = (date) => (date ? new Date(date).toLocaleDateString() : "Not set");
@@ -17,6 +18,7 @@ const LostItemDetails = () => {
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
   const [messageText, setMessageText] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -62,13 +64,20 @@ const LostItemDetails = () => {
     }
   };
 
+  const handleMessageChange = (event) => {
+    setMessageText(event.target.value);
+    setFieldErrors({ ...fieldErrors, message: "" });
+  };
+
   const handleSendMessage = async (event) => {
     event.preventDefault();
     setError("");
     setNotice("");
 
-    if (!messageText.trim()) {
-      setError("Message cannot be empty.");
+    const validationErrors = validateMessageForm(messageText);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
       return;
     }
 
@@ -161,7 +170,7 @@ const LostItemDetails = () => {
         {notice && <div className="alert alert-success">{notice}</div>}
         {error && <div className="alert alert-error">{error}</div>}
         {canMessageOwner ? (
-          <form onSubmit={handleSendMessage} className="stacked-form">
+          <form onSubmit={handleSendMessage} className="stacked-form" noValidate>
             <div>
               <p className="eyebrow">Message owner</p>
               <h2>Regarding: {item.itemName}</h2>
@@ -169,11 +178,12 @@ const LostItemDetails = () => {
             <label>
               Message
               <textarea
+                className={fieldErrors.message ? "input-error" : ""}
                 rows="6"
                 value={messageText}
-                onChange={(event) => setMessageText(event.target.value)}
-               
+                onChange={handleMessageChange}
               />
+              {fieldErrors.message && <span className="field-error">{fieldErrors.message}</span>}
             </label>
             <button className="button" type="submit" disabled={submitting}>
               {submitting ? "Sending..." : "Send Message"}

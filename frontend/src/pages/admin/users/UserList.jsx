@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { deleteUser, getUsers } from "../../../services/userService";
+import { firstError, hasErrors, validateUserFilters } from "../../../utils/validation";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [filters, setFilters] = useState({ search: "", role: "", status: "" });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -32,11 +34,23 @@ const UserList = () => {
   }, []);
 
   const handleFilterChange = (event) => {
-    setFilters({ ...filters, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    setFilters({ ...filters, [name]: value });
+    setFieldErrors({ ...fieldErrors, [name]: "" });
   };
 
   const applyFilters = (event) => {
     event.preventDefault();
+    setMessage("");
+
+    const validationErrors = validateUserFilters(filters);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
+      return;
+    }
+
+    setFieldErrors({});
     loadUsers();
   };
 
@@ -68,23 +82,46 @@ const UserList = () => {
         </Link>
       </div>
 
-      <form className="filter-bar" onSubmit={applyFilters}>
-        <input
-          name="search"
-          placeholder="Search name or email"
-          value={filters.search}
-          onChange={handleFilterChange}
-        />
-        <select name="role" value={filters.role} onChange={handleFilterChange}>
-          <option value="">All roles</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
-        </select>
-        <select name="status" value={filters.status} onChange={handleFilterChange}>
-          <option value="">All statuses</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+      <form className="filter-bar" onSubmit={applyFilters} noValidate>
+        <label>
+          Search
+          <input
+            className={fieldErrors.search ? "input-error" : ""}
+            name="search"
+            placeholder="Search name or email"
+            value={filters.search}
+            onChange={handleFilterChange}
+          />
+          {fieldErrors.search && <span className="field-error">{fieldErrors.search}</span>}
+        </label>
+        <label>
+          Role
+          <select
+            className={fieldErrors.role ? "input-error" : ""}
+            name="role"
+            value={filters.role}
+            onChange={handleFilterChange}
+          >
+            <option value="">All roles</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+          {fieldErrors.role && <span className="field-error">{fieldErrors.role}</span>}
+        </label>
+        <label>
+          Status
+          <select
+            className={fieldErrors.status ? "input-error" : ""}
+            name="status"
+            value={filters.status}
+            onChange={handleFilterChange}
+          >
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          {fieldErrors.status && <span className="field-error">{fieldErrors.status}</span>}
+        </label>
         <button className="button button-secondary" type="submit">
           Apply
         </button>

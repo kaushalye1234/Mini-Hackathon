@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const {
   createLostItem,
   deleteLostItem,
@@ -13,14 +13,15 @@ const { uploadLostItemImage } = require("../middleware/uploadMiddleware");
 const {
   trimBodyStrings,
   validateCreateLostItem,
-  validateUpdateLostItem
+  validateUpdateLostItem,
+  validateLostItemFilters
 } = require("../middleware/validators/lostItemValidator");
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", getLostItems);
+router.get("/", validateLostItemFilters, getLostItems);
 router.post("/", uploadLostItemImage, trimBodyStrings, validateCreateLostItem, createLostItem);
 router.get("/my", getMyLostItems);
 router.patch("/:id/resolve", resolveLostItem);

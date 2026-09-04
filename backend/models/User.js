@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+﻿const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 
 const ROLES = ["admin", "user"];
@@ -9,7 +9,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required."],
       trim: true,
-      minlength: [2, "Name must be at least 2 characters long."]
+      minlength: [2, "Name needs 2 characters."],
+      maxlength: [60, "Name is too long."],
+      validate: [
+        {
+          validator: (value) => !/\d/.test(value),
+          message: "Name cannot include numbers."
+        },
+        {
+          validator: (value) => !/[<>]/.test(value),
+          message: "Name has invalid characters."
+        }
+      ]
     },
     email: {
       type: String,
@@ -17,12 +28,30 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address."]
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Enter a valid email."]
     },
     password: {
       type: String,
       required: [true, "Password is required."],
-      minlength: [6, "Password must contain at least 6 characters."],
+      minlength: [8, "Password needs 8 characters."],
+      validate: [
+        {
+          validator: (value) => /[A-Z]/.test(value),
+          message: "Password needs one capital letter."
+        },
+        {
+          validator: (value) => /[a-z]/.test(value),
+          message: "Password needs one lowercase letter."
+        },
+        {
+          validator: (value) => /\d/.test(value),
+          message: "Password needs one number."
+        },
+        {
+          validator: (value) => !/\s/.test(value),
+          message: "Password cannot contain spaces."
+        }
+      ],
       select: false
     },
     role: {

@@ -1,18 +1,11 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getUserById, updateUser } from "../../../services/userService";
-
-const validate = (form) => {
-  if (!form.name.trim()) return "Name is required.";
-  if (form.name.trim().length < 2) return "Name must be at least 2 characters long.";
-  if (!form.email.trim()) return "Email is required.";
-  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Please enter a valid email address.";
-  if (!["admin", "user"].includes(form.role)) return "Role is required";
-  return "";
-};
+import { firstError, hasErrors, validateAdminUserForm } from "../../../utils/validation";
 
 const EditUser = () => {
   const [form, setForm] = useState({ name: "", email: "", role: "user", isActive: true });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,15 +35,17 @@ const EditUser = () => {
   const handleChange = (event) => {
     const { name, type, checked, value } = event.target;
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    setFieldErrors({ ...fieldErrors, [name]: "" });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    const validationError = validate(form);
-    if (validationError) {
-      setError(validationError);
+    const validationErrors = validateAdminUserForm(form);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
       return;
     }
 
@@ -75,27 +70,47 @@ const EditUser = () => {
         <p className="eyebrow">Admin</p>
         <h1>Edit User</h1>
       </div>
-      <form className="panel form-panel" onSubmit={handleSubmit}>
+      <form className="panel form-panel" onSubmit={handleSubmit} noValidate>
         {error && <div className="alert alert-error">{error}</div>}
         <label>
           Name
-          <input name="name" value={form.name} onChange={handleChange} />
+          <input
+            className={fieldErrors.name ? "input-error" : ""}
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+          />
+          {fieldErrors.name && <span className="field-error">{fieldErrors.name}</span>}
         </label>
         <label>
           Email
-          <input name="email" type="email" value={form.email} onChange={handleChange} />
+          <input
+            className={fieldErrors.email ? "input-error" : ""}
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+          />
+          {fieldErrors.email && <span className="field-error">{fieldErrors.email}</span>}
         </label>
         <label>
           Role
-          <select name="role" value={form.role} onChange={handleChange}>
+          <select
+            className={fieldErrors.role ? "input-error" : ""}
+            name="role"
+            value={form.role}
+            onChange={handleChange}
+          >
             <option value="user">User</option>
             <option value="admin">Admin</option>
           </select>
+          {fieldErrors.role && <span className="field-error">{fieldErrors.role}</span>}
         </label>
         <label className="checkbox-row">
           <input name="isActive" type="checkbox" checked={form.isActive} onChange={handleChange} />
           Active account
         </label>
+        {fieldErrors.isActive && <span className="field-error">{fieldErrors.isActive}</span>}
         <div className="form-actions">
           <button className="button" type="submit" disabled={saving}>
             {saving ? "Saving..." : "Save User"}

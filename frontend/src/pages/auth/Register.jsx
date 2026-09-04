@@ -1,36 +1,30 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-
-const validate = (form) => {
-  if (!form.name.trim()) return "Name is required.";
-  if (form.name.trim().length < 2) return "Name must be at least 2 characters long.";
-  if (!form.email.trim()) return "Email is required.";
-  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Please enter a valid email address.";
-  if (!form.password) return "Password is required.";
-  if (form.password.length < 6) return "Password must contain at least 6 characters.";
-  if (form.password !== form.confirmPassword) return "Passwords do not match.";
-  return "";
-};
+import { firstError, hasErrors, validateRegisterForm } from "../../utils/validation";
 
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (event) => {
-    setForm({ ...form, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    setForm({ ...form, [name]: value });
+    setFieldErrors({ ...fieldErrors, [name]: "" });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    const validationError = validate(form);
-    if (validationError) {
-      setError(validationError);
+    const validationErrors = validateRegisterForm(form);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
       return;
     }
 
@@ -51,7 +45,7 @@ const Register = () => {
 
   return (
     <section className="auth-page">
-      <form className="panel form-panel" onSubmit={handleSubmit}>
+      <form className="panel form-panel" onSubmit={handleSubmit} noValidate>
         <div>
           <p className="eyebrow">Create account</p>
           <h1>Register</h1>
@@ -59,24 +53,48 @@ const Register = () => {
         {error && <div className="alert alert-error">{error}</div>}
         <label>
           Name
-          <input name="name" value={form.name} onChange={handleChange} />
+          <input
+            className={fieldErrors.name ? "input-error" : ""}
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+          />
+          {fieldErrors.name && <span className="field-error">{fieldErrors.name}</span>}
         </label>
         <label>
           Email
-          <input name="email" type="email" value={form.email} onChange={handleChange} />
+          <input
+            className={fieldErrors.email ? "input-error" : ""}
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+          />
+          {fieldErrors.email && <span className="field-error">{fieldErrors.email}</span>}
         </label>
         <label>
           Password
-          <input name="password" type="password" value={form.password} onChange={handleChange} />
+          <input
+            className={fieldErrors.password ? "input-error" : ""}
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+          />
+          {fieldErrors.password && <span className="field-error">{fieldErrors.password}</span>}
         </label>
         <label>
           Confirm Password
           <input
+            className={fieldErrors.confirmPassword ? "input-error" : ""}
             name="confirmPassword"
             type="password"
             value={form.confirmPassword}
             onChange={handleChange}
           />
+          {fieldErrors.confirmPassword && (
+            <span className="field-error">{fieldErrors.confirmPassword}</span>
+          )}
         </label>
         <button className="button" type="submit" disabled={loading}>
           {loading ? "Creating..." : "Register"}

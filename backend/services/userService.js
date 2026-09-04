@@ -1,15 +1,14 @@
-const { User } = require("../models/User");
+﻿const { User } = require("../models/User");
 
 const sanitizeUser = (user) => user.toJSON();
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const buildUserFilters = ({ search, role, status }) => {
   const filters = {};
 
   if (search) {
-    filters.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { email: { $regex: search, $options: "i" } }
-    ];
+    const regex = { $regex: escapeRegex(search.trim()), $options: "i" };
+    filters.$or = [{ name: regex }, { email: regex }];
   }
 
   if (role) {

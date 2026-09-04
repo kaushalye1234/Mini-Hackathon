@@ -1,4 +1,4 @@
-const { User } = require("../models/User");
+﻿const { User } = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
 const sanitizeUser = (user) => user.toJSON();
@@ -20,14 +20,14 @@ const registerUser = async ({ name, email, password }) => {
 const authenticateCredentials = async ({ email, password }) => {
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    const error = new Error("Invalid email or password.");
+    const error = new Error("Wrong credentials.");
     error.statusCode = 401;
     throw error;
   }
 
   const passwordMatches = await user.comparePassword(password);
   if (!passwordMatches) {
-    const error = new Error("Invalid email or password.");
+    const error = new Error("Wrong credentials.");
     error.statusCode = 401;
     throw error;
   }
@@ -51,7 +51,7 @@ const loginAdminUser = async ({ email, password }) => {
   const user = await authenticateCredentials({ email, password });
 
   if (user.role !== "admin") {
-    const error = new Error("Admin access requires an admin account");
+    const error = new Error("Admin account required.");
     error.statusCode = 403;
     throw error;
   }

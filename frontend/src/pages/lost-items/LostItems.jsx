@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import {
@@ -8,6 +8,7 @@ import {
   resolveLostItem,
   statuses
 } from "../../services/lostItemService";
+import { firstError, hasErrors, todayInputValue, validateLostItemFilters } from "../../utils/validation";
 
 const getId = (value) => value?.id || value?._id || value;
 const formatDate = (date) => (date ? new Date(date).toLocaleDateString() : "Not set");
@@ -18,6 +19,7 @@ const initialFilters = { search: "", category: "", location: "", status: "LOST",
 const LostItems = () => {
   const { user } = useAuth();
   const [filters, setFilters] = useState(initialFilters);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,15 +44,34 @@ const LostItems = () => {
   }, []);
 
   const handleChange = (event) => {
-    const nextFilters = { ...filters, [event.target.name]: event.target.value };
+    const { name, value } = event.target;
+    const nextFilters = { ...filters, [name]: value };
     setFilters(nextFilters);
-    if (["category", "status", "lostDate"].includes(event.target.name)) {
+    setFieldErrors({ ...fieldErrors, [name]: "" });
+
+    if (["category", "status", "lostDate"].includes(name)) {
+      const validationErrors = validateLostItemFilters(nextFilters, categories);
+      if (hasErrors(validationErrors)) {
+        setFieldErrors(validationErrors);
+        setError(firstError(validationErrors));
+        return;
+      }
       loadItems(nextFilters);
     }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setMessage("");
+
+    const validationErrors = validateLostItemFilters(filters, categories);
+    if (hasErrors(validationErrors)) {
+      setFieldErrors(validationErrors);
+      setError(firstError(validationErrors));
+      return;
+    }
+
+    setFieldErrors({});
     loadItems(filters);
   };
 
@@ -89,15 +110,17 @@ const LostItems = () => {
         </Link>
       </div>
 
-      <form className="filter-bar lost-filter lost-search-panel" onSubmit={handleSubmit}>
+      <form className="filter-bar lost-filter lost-search-panel" onSubmit={handleSubmit} noValidate>
         <label>
           Search
           <input
+            className={fieldErrors.search ? "input-error" : ""}
             name="search"
             placeholder="Search item name or description"
             value={filters.search}
             onChange={handleChange}
           />
+          {fieldErrors.search && <span className="field-error">{fieldErrors.search}</span>}
         </label>
         <label>
           Category
@@ -113,19 +136,34 @@ const LostItems = () => {
         <label>
           Location
           <input
+            className={fieldErrors.location ? "input-error" : ""}
             name="location"
             placeholder="Filter by location"
             value={filters.location}
             onChange={handleChange}
           />
+          {fieldErrors.location && <span className="field-error">{fieldErrors.location}</span>}
         </label>
         <label>
           Lost Date
-          <input name="lostDate" type="date" value={filters.lostDate} onChange={handleChange} />
+          <input
+            className={fieldErrors.lostDate ? "input-error" : ""}
+            max={todayInputValue()}
+            name="lostDate"
+            type="date"
+            value={filters.lostDate}
+            onChange={handleChange}
+          />
+          {fieldErrors.lostDate && <span className="field-error">{fieldErrors.lostDate}</span>}
         </label>
         <label>
           Status
-          <select name="status" value={filters.status} onChange={handleChange}>
+          <select
+            className={fieldErrors.status ? "input-error" : ""}
+            name="status"
+            value={filters.status}
+            onChange={handleChange}
+          >
             <option value="">All statuses</option>
             {statuses.map((status) => (
               <option key={status} value={status}>
@@ -133,6 +171,7 @@ const LostItems = () => {
               </option>
             ))}
           </select>
+          {fieldErrors.status && <span className="field-error">{fieldErrors.status}</span>}
         </label>
         <button className="button" type="submit">
           Search
