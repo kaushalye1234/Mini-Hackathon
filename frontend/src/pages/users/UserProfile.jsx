@@ -3,10 +3,10 @@ import useAuth from "../../hooks/useAuth";
 import { updateProfile } from "../../services/userService";
 
 const validate = (form) => {
-  if (!form.name.trim()) return "Name is required";
-  if (form.name.trim().length < 2) return "Name must be at least 2 characters long";
-  if (!form.email.trim()) return "Email is required";
-  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Valid email is required";
+  if (!form.name.trim()) return "Name is required.";
+  if (form.name.trim().length < 2) return "Name must be at least 2 characters long.";
+  if (!form.email.trim()) return "Email is required.";
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Please enter a valid email address.";
   return "";
 };
 
@@ -35,7 +35,7 @@ const UserProfile = () => {
       localStorage.setItem("user", JSON.stringify(data.user));
       setMessage(data.message);
     } catch (apiError) {
-      setError(apiError.response?.data?.message || "Profile update failed");
+      setError(apiError.response?.data?.message || "Profile update failed.");
     } finally {
       setLoading(false);
     }

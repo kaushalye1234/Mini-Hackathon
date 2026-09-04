@@ -3,10 +3,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getUserById, updateUser } from "../../../services/userService";
 
 const validate = (form) => {
-  if (!form.name.trim()) return "Name is required";
-  if (form.name.trim().length < 2) return "Name must be at least 2 characters long";
-  if (!form.email.trim()) return "Email is required";
-  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Valid email is required";
+  if (!form.name.trim()) return "Name is required.";
+  if (form.name.trim().length < 2) return "Name must be at least 2 characters long.";
+  if (!form.email.trim()) return "Email is required.";
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Please enter a valid email address.";
   if (!["admin", "user"].includes(form.role)) return "Role is required";
   return "";
 };

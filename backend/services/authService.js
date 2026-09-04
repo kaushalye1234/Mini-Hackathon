@@ -6,7 +6,7 @@ const sanitizeUser = (user) => user.toJSON();
 const registerUser = async ({ name, email, password }) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    const error = new Error("Email already exists");
+    const error = new Error("An account with this email already exists.");
     error.statusCode = 400;
     throw error;
   }
@@ -20,20 +20,20 @@ const registerUser = async ({ name, email, password }) => {
 const authenticateCredentials = async ({ email, password }) => {
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    const error = new Error("Incorrect email or password");
+    const error = new Error("Invalid email or password.");
     error.statusCode = 401;
     throw error;
   }
 
   const passwordMatches = await user.comparePassword(password);
   if (!passwordMatches) {
-    const error = new Error("Incorrect email or password");
+    const error = new Error("Invalid email or password.");
     error.statusCode = 401;
     throw error;
   }
 
   if (!user.isActive) {
-    const error = new Error("Account disabled");
+    const error = new Error("This account is disabled.");
     error.statusCode = 403;
     throw error;
   }

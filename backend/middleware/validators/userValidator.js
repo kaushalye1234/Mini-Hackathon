@@ -8,15 +8,15 @@ const isBlank = (value) => typeof value !== "string" || value.trim().length === 
 
 const validateName = (name, required, res) => {
   if (required && isBlank(name)) {
-    return fail(res, "Name is required");
+    return fail(res, "Name is required.");
   }
 
   if (name !== undefined && isBlank(name)) {
-    return fail(res, "Name cannot be empty");
+    return fail(res, "Name is required.");
   }
 
   if (name !== undefined && name.trim().length < 2) {
-    return fail(res, "Name must be at least 2 characters long");
+    return fail(res, "Name must be at least 2 characters long.");
   }
 
   return null;
@@ -24,11 +24,11 @@ const validateName = (name, required, res) => {
 
 const validateEmail = (email, required, res) => {
   if (required && isBlank(email)) {
-    return fail(res, "Email is required");
+    return fail(res, "Email is required.");
   }
 
   if (email !== undefined && !emailRegex.test(email.trim())) {
-    return fail(res, "Valid email is required");
+    return fail(res, "Please enter a valid email address.");
   }
 
   return null;
@@ -36,11 +36,11 @@ const validateEmail = (email, required, res) => {
 
 const validatePassword = (password, required, res) => {
   if (required && isBlank(password)) {
-    return fail(res, "Password is required");
+    return fail(res, "Password is required.");
   }
 
   if (password !== undefined && password.length < 6) {
-    return fail(res, "Password must be at least 6 characters long");
+    return fail(res, "Password must contain at least 6 characters.");
   }
 
   return null;

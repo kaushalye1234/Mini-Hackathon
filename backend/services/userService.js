@@ -46,7 +46,7 @@ const getUserById = async (id) => {
 const createUser = async ({ name, email, password, role = "user", isActive = true }) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    const error = new Error("Email already exists");
+    const error = new Error("An account with this email already exists.");
     error.statusCode = 400;
     throw error;
   }
@@ -59,7 +59,7 @@ const updateUser = async (id, updates) => {
   if (updates.email) {
     const existingUser = await User.findOne({ email: updates.email, _id: { $ne: id } });
     if (existingUser) {
-      const error = new Error("Email already exists");
+      const error = new Error("An account with this email already exists.");
       error.statusCode = 400;
       throw error;
     }

@@ -3,13 +3,13 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 const validate = (form) => {
-  if (!form.email.trim()) return "Email is required";
-  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Valid email is required";
-  if (!form.password) return "Password is required";
+  if (!form.email.trim()) return "Email is required.";
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Please enter a valid email address.";
+  if (!form.password) return "Password is required.";
   return "";
 };
 
-const Login = () => {
+const Login = ({ isAdminLogin = false }) => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,12 +34,12 @@ const Login = () => {
     try {
       setLoading(true);
       const fromPath = location.state?.from?.pathname;
-      const requireAdmin = Boolean(fromPath?.startsWith("/admin"));
-      const user = await login(form, { requireAdmin });
-      const nextPath = fromPath || (user.role === "admin" ? "/admin" : "/profile");
+      const user = await login(form, { requireAdmin: isAdminLogin });
+      const fallbackPath = isAdminLogin || user.role === "admin" ? "/admin" : "/profile";
+      const nextPath = fromPath || fallbackPath;
       navigate(nextPath, { replace: true });
     } catch (apiError) {
-      setError(apiError.response?.data?.message || "Login failed");
+      setError(apiError.response?.data?.message || "Login failed.");
     } finally {
       setLoading(false);
     }
@@ -49,8 +49,8 @@ const Login = () => {
     <section className="auth-page">
       <form className="panel form-panel" onSubmit={handleSubmit}>
         <div>
-          <p className="eyebrow">Secure access</p>
-          <h1>Login</h1>
+          <p className="eyebrow">{isAdminLogin ? "Admin access" : "Secure access"}</p>
+          <h1>{isAdminLogin ? "Admin Login" : "Login"}</h1>
         </div>
         {error && <div className="alert alert-error">{error}</div>}
         <label>
@@ -62,11 +62,17 @@ const Login = () => {
           <input name="password" type="password" value={form.password} onChange={handleChange} />
         </label>
         <button className="button" type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Login"}
+          {loading ? "Signing in..." : isAdminLogin ? "Admin Login" : "Login"}
         </button>
-        <p className="muted">
-          Need an account? <Link to="/register">Register</Link>
-        </p>
+        {isAdminLogin ? (
+          <p className="muted">
+            Normal user? <Link to="/login">Login here</Link>
+          </p>
+        ) : (
+          <p className="muted">
+            Need an account? <Link to="/register">Register</Link>
+          </p>
+        )}
       </form>
     </section>
   );

@@ -6,7 +6,7 @@ const errorMiddleware = (err, req, res, next) => {
   }
 
   if (err.code === 11000) {
-    return res.status(400).json({ message: "Email already exists" });
+    return res.status(400).json({ message: "An account with this email already exists." });
   }
 
   if (err.name === "ValidationError") {

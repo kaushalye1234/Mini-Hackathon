@@ -4,6 +4,8 @@ const cors = require("cors");
 const express = require("express");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const lostItemRoutes = require("./routes/lostItemRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 const userRoutes = require("./routes/userRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
 
@@ -19,11 +21,13 @@ app.use(
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.json({ message: "User Management API is running" });
+  res.json({ message: "CampusFind LK API is running" });
 });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/lost-items", lostItemRoutes);
+app.use("/api/messages", messageRoutes);
 app.use(errorMiddleware);
 
 connectDB()

@@ -3,13 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
 const validate = (form) => {
-  if (!form.name.trim()) return "Name is required";
-  if (form.name.trim().length < 2) return "Name must be at least 2 characters long";
-  if (!form.email.trim()) return "Email is required";
-  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Valid email is required";
-  if (!form.password) return "Password is required";
-  if (form.password.length < 6) return "Password must be at least 6 characters long";
-  if (form.password !== form.confirmPassword) return "Passwords do not match";
+  if (!form.name.trim()) return "Name is required.";
+  if (form.name.trim().length < 2) return "Name must be at least 2 characters long.";
+  if (!form.email.trim()) return "Email is required.";
+  if (!/^\S+@\S+\.\S+$/.test(form.email)) return "Please enter a valid email address.";
+  if (!form.password) return "Password is required.";
+  if (form.password.length < 6) return "Password must contain at least 6 characters.";
+  if (form.password !== form.confirmPassword) return "Passwords do not match.";
   return "";
 };
 
@@ -43,7 +43,7 @@ const Register = () => {
       });
       navigate("/profile");
     } catch (apiError) {
-      setError(apiError.response?.data?.message || "Registration failed");
+      setError(apiError.response?.data?.message || "Registration failed.");
     } finally {
       setLoading(false);
     }
