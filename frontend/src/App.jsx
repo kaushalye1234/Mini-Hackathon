@@ -15,6 +15,11 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import UserProfile from "./pages/users/UserProfile";
 
+// Member 2: Lost Item CRUD Pages
+import ReportLostItemPage from "./pages/lostItems/ReportLostItemPage";
+import EditLostItemPage from "./pages/lostItems/EditLostItemPage";
+import MyLostItemsPage from "./pages/lostItems/MyLostItemsPage";
+
 // Member 4: Messaging Pages
 import MessagesPage from "./pages/messages/MessagesPage";
 import MessageDetailsPage from "./pages/messages/MessageDetailsPage";
@@ -44,6 +49,10 @@ const App = () => {
           {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserProfile />} />
+            {/* Member 2: Lost Item CRUD Routes */}
+            <Route path="/report-lost-item" element={<ReportLostItemPage />} />
+            <Route path="/my-lost-items" element={<MyLostItemsPage />} />
+            <Route path="/lost-items/:id/edit" element={<EditLostItemPage />} />
             {/* Member 4: Messaging Routes */}
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/messages/:id" element={<MessageDetailsPage />} />

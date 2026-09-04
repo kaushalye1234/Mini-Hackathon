@@ -2,10 +2,12 @@ const mongoose = require("mongoose");
 
 const CATEGORIES = [
   "Electronics",
-  "Clothing",
+  "Wallet / Purse",
+  "ID / Documents",
   "Books",
+  "Clothing",
+  "Bags",
   "Keys",
-  "Documents",
   "Accessories",
   "Other"
 ];
@@ -38,11 +40,12 @@ const lostItemSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      maxlength: [1000, "Description cannot exceed 1000 characters"],
       default: ""
     },
     dateLost: {
       type: Date,
-      default: Date.now
+      required: [true, "Date lost is required"]
     },
     status: {
       type: String,
