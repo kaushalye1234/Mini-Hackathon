@@ -15,6 +15,11 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import UserProfile from "./pages/users/UserProfile";
 
+// Member 4: Messaging Pages
+import MessagesPage from "./pages/messages/MessagesPage";
+import MessageDetailsPage from "./pages/messages/MessageDetailsPage";
+import SendMessagePage from "./pages/messages/SendMessagePage";
+
 // Member 3: Search, Filter & Discovery Pages
 import LostItemsPage from "./pages/lostItems/LostItemsPage";
 import LostItemDetailsPage from "./pages/lostItems/LostItemDetailsPage";
@@ -39,6 +44,10 @@ const App = () => {
           {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserProfile />} />
+            {/* Member 4: Messaging Routes */}
+            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/messages/:id" element={<MessageDetailsPage />} />
+            <Route path="/messages/send/:lostItemId" element={<SendMessagePage />} />
           </Route>
 
           {/* Protected Admin Routes */}

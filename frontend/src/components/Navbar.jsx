@@ -18,6 +18,7 @@ const Navbar = () => {
       <nav className="nav-links">
         <NavLink to="/lost-items">Lost Items</NavLink>
         {isAuthenticated && <NavLink to="/profile">Profile</NavLink>}
+        {isAuthenticated && <NavLink to="/messages">Messages</NavLink>}
         {isAdmin && <NavLink to="/admin">Admin</NavLink>}
         {!isAuthenticated && <NavLink to="/login">Login</NavLink>}
         {!isAuthenticated && <NavLink to="/register">Register</NavLink>}

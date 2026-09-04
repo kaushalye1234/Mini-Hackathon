@@ -6,6 +6,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const lostItemRoutes = require("./routes/lostItemRoutes");
+const messageRoutes = require("./routes/messageRoutes");
 const errorMiddleware = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/lost-items", lostItemRoutes);
+app.use("/api/messages", messageRoutes);
 app.use(errorMiddleware);
 
 connectDB()
