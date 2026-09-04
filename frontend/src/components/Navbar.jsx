@@ -12,10 +12,11 @@ const Navbar = () => {
 
   return (
     <header className="topbar">
-      <Link className="brand" to={isAuthenticated ? "/profile" : "/login"}>
-        User Management
+      <Link className="brand" to="/lost-items">
+        CampusFind LK
       </Link>
       <nav className="nav-links">
+        <NavLink to="/lost-items">Lost Items</NavLink>
         {isAuthenticated && <NavLink to="/profile">Profile</NavLink>}
         {isAdmin && <NavLink to="/admin">Admin</NavLink>}
         {!isAuthenticated && <NavLink to="/login">Login</NavLink>}
