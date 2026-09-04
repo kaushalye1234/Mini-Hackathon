@@ -1,3 +1,8 @@
+/**
+ * CampusFind LK - Main App Component & Router
+ * File: frontend/src/App.jsx
+ */
+
 import { Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -10,20 +15,42 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import UserProfile from "./pages/users/UserProfile";
 
+// Member 4: Messaging Pages
+import MessagesPage from "./pages/messages/MessagesPage";
+import MessageDetailsPage from "./pages/messages/MessageDetailsPage";
+import SendMessagePage from "./pages/messages/SendMessagePage";
+
+// Member 3: Search, Filter & Discovery Pages
+import LostItemsPage from "./pages/lostItems/LostItemsPage";
+import LostItemDetailsPage from "./pages/lostItems/LostItemDetailsPage";
+
 const App = () => {
   return (
     <>
       <Navbar />
       <main>
         <Routes>
-          <Route path="/" element={<Navigate to="/profile" replace />} />
+          {/* Default home route redirects to Lost Items discovery page */}
+          <Route path="/" element={<Navigate to="/lost-items" replace />} />
+
+          {/* Member 3: Discovery & Detail Routes */}
+          <Route path="/lost-items" element={<LostItemsPage />} />
+          <Route path="/lost-items/:id" element={<LostItemDetailsPage />} />
+
+          {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<UserProfile />} />
+            {/* Member 4: Messaging Routes */}
+            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/messages/:id" element={<MessageDetailsPage />} />
+            <Route path="/messages/send/:lostItemId" element={<SendMessagePage />} />
           </Route>
 
+          {/* Protected Admin Routes */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
@@ -33,7 +60,8 @@ const App = () => {
             </Route>
           </Route>
 
-          <Route path="*" element={<Navigate to="/profile" replace />} />
+          {/* Catch-all route */}
+          <Route path="*" element={<Navigate to="/lost-items" replace />} />
         </Routes>
       </main>
     </>
