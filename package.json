@@ -1,0 +1,10 @@
+{
+  "name": "mini-hack-mern-user-management",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:backend": "npm --prefix backend install",
+    "start:backend": "npm --prefix backend start",
+    "build:frontend": "npm --prefix frontend install && npm --prefix frontend run build"
+  }
+}
