@@ -16,6 +16,7 @@ const uploadImageToCloudinary = (file) => {
       }
     );
 
+    
     uploadStream.end(file.buffer);
   });
 };
