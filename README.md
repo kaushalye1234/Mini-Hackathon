@@ -240,7 +240,24 @@ GET /api/lost-items?search=lap&category=Electronics&location=Computing%20Lab&sta
 
 ## Deployment Link
 
-Placeholder: add deployment link here.
+Frontend: https://mini-hackathon-d2vf.vercel.app
+
+Backend API: https://mini-hackathon-five-mocha.vercel.app/api
+
+In the frontend Vercel project's environment variables, set
+`VITE_API_URL=https://mini-hackathon-five-mocha.vercel.app/api` for Production
+(and Preview if needed), without spaces or newlines. Redeploy the frontend after
+changing this value: Vite embeds it at build time. The API client also trims
+whitespace and adds `/api` when only a backend host is configured.
+
+In the backend project, set
+`FRONTEND_URL=https://mini-hackathon-d2vf.vercel.app` and keep `MONGO_URI`,
+`JWT_SECRET`, and Cloudinary credentials in the backend environment only.
+The backend root returns an API status message; use the frontend link to open
+the application.
+
+Run API URL regression checks with `npm --prefix frontend test` and verify a
+production build with `npm --prefix frontend run build`.
 
 ## Demo Video Link
 
